@@ -3,6 +3,8 @@ import Helmet from 'react-helmet';
 import { safeConfigGet } from '../../../utils/config';
 
 function Home() {
+  const { error } = this.state;
+  
   return (
     <article>
       <Helmet title="Home" />
