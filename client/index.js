@@ -5,6 +5,7 @@ import { render } from 'react-dom';
 import BrowserRouter from 'react-router-dom/BrowserRouter';
 import asyncBootstrapper from 'react-async-bootstrapper';
 import { AsyncComponentProvider } from 'react-async-component';
+import { JobProvider } from 'react-jobs';
 
 import './polyfills';
 
@@ -23,6 +24,10 @@ const supportsHistory = 'pushState' in window.history;
 // eslint-disable-next-line no-underscore-dangle
 const asyncComponentsRehydrateState = window.__ASYNC_COMPONENTS_REHYDRATE_STATE__;
 
+// Get any rehydrateState from the job components.
+// eslint-disable-next-line no-underscore-dangle
+const jobsRehydrateState = window.__JOBS_REHYDRATE_STATE__;
+
 /**
  * Renders the given React Application component.
  */
@@ -32,9 +37,11 @@ function renderApp(TheApp) {
   const app = (
     <ReactHotLoader>
       <AsyncComponentProvider rehydrateState={asyncComponentsRehydrateState}>
-        <BrowserRouter forceRefresh={!supportsHistory}>
-          <TheApp />
-        </BrowserRouter>
+        <JobProvider rehydrateState={jobsRehydrateState}>
+          <BrowserRouter forceRefresh={!supportsHistory}>
+            <TheApp />
+          </BrowserRouter>
+        </JobProvider>
       </AsyncComponentProvider>
     </ReactHotLoader>
   );
@@ -58,10 +65,7 @@ if (process.env.BUILD_FLAG_IS_DEV && module.hot) {
   // Accept changes to this file for hot reloading.
   module.hot.accept('./index.js');
   // Any changes to our App will cause a hotload re-render.
-  module.hot.accept(
-    '../shared/components/DemoApp',
-    () => {
-      renderApp(require('../shared/components/DemoApp').default);
-    },
-  );
+  module.hot.accept('../shared/components/DemoApp', () => {
+    renderApp(require('../shared/components/DemoApp').default);
+  });
 }

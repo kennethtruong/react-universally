@@ -12,6 +12,7 @@ import Header from './Header';
 
 import AsyncHomeRoute from './AsyncHomeRoute';
 import AsyncCounterRoute from './AsyncCounterRoute';
+import AsyncJobsRoute from './AsyncJobsRoute';
 import AsyncAboutRoute from './AsyncAboutRoute';
 
 function DemoApp() {
@@ -37,6 +38,7 @@ function DemoApp() {
         <Switch>
           <Route exact path="/" component={AsyncHomeRoute} />
           <Route path="/counter" component={AsyncCounterRoute} />
+          <Route path="/jobs" component={AsyncJobsRoute} />
           <Route path="/about" component={AsyncAboutRoute} />
           <Route component={Error404} />
         </Switch>

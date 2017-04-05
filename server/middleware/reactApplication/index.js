@@ -1,9 +1,9 @@
-
 import React from 'react';
 import Helmet from 'react-helmet';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
 import { AsyncComponentProvider, createAsyncContext } from 'react-async-component';
+import { JobProvider, createJobContext } from 'react-jobs';
 import asyncBootstrapper from 'react-async-bootstrapper';
 
 import config from '../../../config';
@@ -39,6 +39,9 @@ export default function reactApplicationMiddleware(request, response) {
   // Create a context for our AsyncComponentProvider.
   const asyncComponentsContext = createAsyncContext();
 
+  // Create a context for our JobProvider.
+  const jobContext = createJobContext();
+
   // Create a context for <StaticRouter>, which will allow us to
   // query for the results of the render.
   const reactRouterContext = {};
@@ -46,9 +49,11 @@ export default function reactApplicationMiddleware(request, response) {
   // Declare our React application.
   const app = (
     <AsyncComponentProvider asyncContext={asyncComponentsContext}>
-      <StaticRouter location={request.url} context={reactRouterContext}>
-        <DemoApp />
-      </StaticRouter>
+      <JobProvider jobContext={jobContext}>
+        <StaticRouter location={request.url} context={reactRouterContext}>
+          <DemoApp />
+        </StaticRouter>
+      </JobProvider>
     </AsyncComponentProvider>
   );
 
@@ -64,6 +69,7 @@ export default function reactApplicationMiddleware(request, response) {
         nonce={nonce}
         helmet={Helmet.rewind()}
         asyncComponentsState={asyncComponentsContext.getState()}
+        jobsState={jobContext.getState()}
       />,
     );
 
@@ -78,11 +84,11 @@ export default function reactApplicationMiddleware(request, response) {
     response
       .status(
         reactRouterContext.missed
-          // If the renderResult contains a "missed" match then we set a 404 code.
-          // Our App component will handle the rendering of an Error404 view.
-          ? 404
-          // Otherwise everything is all good and we send a 200 OK status.
-          : 200,
+          ? // If the renderResult contains a "missed" match then we set a 404 code.
+            // Our App component will handle the rendering of an Error404 view.
+            404
+          : // Otherwise everything is all good and we send a 200 OK status.
+            200,
       )
       .send(`<!DOCTYPE html>${html}`);
   });
