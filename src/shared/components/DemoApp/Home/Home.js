@@ -3,7 +3,7 @@ import Helmet from 'react-helmet';
 import { safeConfigGet } from '../../../utils/config';
 
 function Home() {
-  const { error } = this.state;
+  const { error } = this.someundefinedprop;
   
   return (
     <article>
